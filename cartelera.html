@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartelera de televisión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #eef1f8;
+    --tinta: #161a33;
+    --tinta-suave: #5a6080;
+    --superficie: #ffffff;
+    --linea: #d9dff0;
+    --cobalto: #3d4bff;
+    --directo: #ff4d5e;
+    --marco: #0f1226;
+    --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+    --texto: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--tinta);
+    font-family: var(--texto);
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .contenedor {
+    width: min(1200px, 100% - 2rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+
+  /* Cabecera */
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  header h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  header p { margin: .4rem 0 0; color: var(--tinta-suave); }
+  .reloj {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.1rem;
+    padding: .5rem 1rem;
+    border: 2px solid var(--tinta);
+    border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Disposición en dos zonas */
+  .rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .rejilla { grid-template-columns: 1fr; }
+  }
+
+  /* Reproductor */
+  .zona-player { position: sticky; top: 1rem; }
+  @media (max-width: 900px) { .zona-player { position: static; } }
+
+  .marco {
+    background: var(--marco);
+    border-radius: 20px;
+    padding: .75rem;
+  }
+  .player {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #1b1f3d;
+  }
+  .player .aviso {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: .25rem;
+    text-align: center;
+    padding: 1rem;
+    color: #aab1d6;
+    font-size: .95rem;
+  }
+  .player .aviso strong {
+    font-family: var(--display);
+    font-size: 1.3rem;
+    color: #fff;
+  }
+  /* El iframe se coloca encima del aviso y lo tapa */
+  .player iframe,
+  .player video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000;
+  }
+
+  .ahora-bar {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: 1rem .5rem .4rem;
+    color: #fff;
+  }
+  .ahora-bar .etiqueta {
+    flex: none;
+    background: var(--directo);
+    color: #fff;
+    font-weight: 600;
+    font-size: .8rem;
+    padding: .15rem .6rem;
+    border-radius: 999px;
+  }
+  .ahora-bar .titulo {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Cartelera */
+  .zona-cartelera h2 {
+    margin: 0 0 1.25rem;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+  }
+
+  .programas {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+  /* Línea vertical de la parrilla */
+  .programas::before {
+    content: "";
+    position: absolute;
+    left: 5.15rem;
+    top: .5rem;
+    bottom: .5rem;
+    width: 2px;
+    background: var(--linea);
+  }
+
+  .programa {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: 1.5rem;
+    padding: .25rem 0 1.1rem;
+    position: relative;
+  }
+  .programa .hora {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.15rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    padding-top: .9rem;
+  }
+  .programa .contenido {
+    background: var(--superficie);
+    border-radius: 14px;
+    padding: .85rem 1.1rem 1rem;
+    border: 1px solid var(--linea);
+    position: relative;
+  }
+  /* Punto sobre la línea */
+  .programa .contenido::before {
+    content: "";
+    position: absolute;
+    left: calc(-.75rem - 6px);
+    top: 1.15rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--fondo);
+    border: 2px solid var(--tinta-suave);
+  }
+  .programa h3 {
+    margin: 0 0 .2rem;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
+  }
+  .programa p {
+    margin: 0;
+    color: var(--tinta-suave);
+    font-size: .95rem;
+    max-width: 62ch;
+  }
+
+  /* Estados: ya emitido y en directo */
+  .programa.pasado { opacity: .5; }
+
+  .programa.actual .hora { color: var(--cobalto); }
+  .programa.actual .contenido {
+    background: var(--cobalto);
+    border-color: var(--cobalto);
+    color: #fff;
+  }
+  .programa.actual .contenido p { color: #dfe2ff; }
+  .programa.actual .contenido::before {
+    background: var(--directo);
+    border-color: var(--fondo);
+    box-shadow: 0 0 0 4px rgba(255, 77, 94, .3);
+  }
+  .programa.actual .contenido::after {
+    content: "En directo";
+    position: absolute;
+    top: .85rem;
+    right: 1rem;
+    background: var(--directo);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: .1rem .6rem;
+    border-radius: 999px;
+  }
+  .programa.actual h3 { padding-right: 5.5rem; }
+
+  /* Único momento animado: el punto de "en directo" */
+  @media (prefers-reduced-motion: no-preference) {
+    .programa.actual .contenido::before { animation: pulso 1.8s ease-in-out infinite; }
+    @keyframes pulso {
+      50% { box-shadow: 0 0 0 8px rgba(255, 77, 94, 0); }
+    }
+  }
+
+  a:focus-visible, button:focus-visible, iframe:focus-visible {
+    outline: 3px solid var(--cobalto);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 480px) {
+    .programa { grid-template-columns: 3.2rem 1fr; gap: 1.2rem; }
+    .programas::before { left: 4.05rem; }
+    .programa .hora { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="contenedor">
+    <header>
+      <div>
+        <h1>Tu Canal</h1>
+        <p>Programación de hoy</p>
+      </div>
+      <div class="reloj" id="reloj" aria-label="Hora actual">--:--</div>
+    </header>
+
+    <main class="rejilla">
+
+      <!-- ZONA DEL REPRODUCTOR -->
+      <section class="zona-player" aria-label="Emisión en directo">
+        <div class="marco">
+          <div class="player">
+            <div class="aviso">
+              <strong>Aquí va el reproductor</strong>
+              <span>Pega tu código &lt;iframe&gt; justo debajo de este aviso</span>
+            </div>
+
+            <!-- ▼▼▼ PEGA AQUÍ EL CÓDIGO EMBEBIDO DE TU STREAMING ▼▼▼ -->
+            <!-- Ejemplo: <iframe src="https://tu-streaming.com/embed/canal" allow="autoplay; fullscreen" allowfullscreen></iframe> -->
+            <!-- ▲▲▲ FIN DE LA ZONA DEL REPRODUCTOR ▲▲▲ -->
+
+          </div>
+          <div class="ahora-bar">
+            <span class="etiqueta">Ahora</span>
+            <span class="titulo" id="titulo-ahora">Cargando programación…</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARTELERA -->
+      <section class="zona-cartelera" aria-label="Cartelera">
+        <h2>Cartelera</h2>
+        <!-- Cada programa necesita data-inicio="HH:MM". El final es el inicio del siguiente. -->
+        <ol class="programas" id="programas">
+          <li class="programa" data-inicio="07:00">
+            <div class="hora">07:00</div>
+            <div class="contenido">
+              <h3>Buenos días</h3>
+              <p>Noticias, tráfico y el tiempo para arrancar la jornada con toda la información.</p>
+            </div>
+          </li>
+          <li class="programa" data-inicio="10:00">
+            <div class="hora">10:00</div>
+            <div class="contenido">
+              <h3>La cocina de Marta</h3>
+              <p>Recetas sencillas de temporada y trucos para sacarles el máximo partido.</p>
+            </div>
+          </li>
+          <li class="programa" data-inicio="12:00">
+            <div class="hora">12:00</div>
+            <div class="contenido">
+              <h3>Documentales del mundo</h3>
+              <p>Un viaje semanal por paisajes, culturas y especies poco conocidas.</p>
+            </div>
+          </li>
+          <li class="programa" data-inicio="14:30">
+            <div class="hora">14:30</div>
+            <div class="contenido">
+              <h3>Telediario</h3>
+              <p>Las noticias más importantes del día, con análisis y conexiones en directo.</p>
+            </div>
+          </li>
+          <li class="programa" data-inicio="16:00">
+            <div class="hora">16:00</div>
+            <div class="contenido">
+              <h3>Cine de sobremesa</h3>
+              <p>Una película clásica para disfrutar con calma después de comer.</p>
+            </div>
+          </li>
+          <li class="programa" data-inicio="18:30">
+            <div class="hora">18:30</div>
+            <div class="contenido">
+              <h3>Mundo animal</h3>
+              <p>Reportajes sobre fauna y naturaleza grabados en cinco continentes.</p>
+            </div>
+          </li>
+          <li class="programa" data-inicio="20:00">
+            <div class="hora">20:00</div>
+            <div class="contenido">
+              <h3>Debate de actualidad</h3>
+              <p>Invitados y expertos discuten los temas que marcan la agenda del día.</p>
+            </div>
+          </li>
+          <li class="programa" data-inicio="22:00">
+            <div class="hora">22:00</div>
+            <div class="contenido">
+              <h3>Serie estrella</h3>
+              <p>Estreno de episodio de la serie de misterio más comentada de la temporada.</p>
+            </div>
+          </li>
+          <li class="programa" data-inicio="23:30">
+            <div class="hora">23:30</div>
+            <div class="contenido">
+              <h3>Noche de monólogos</h3>
+              <p>Humor en directo con los mejores cómicos del circuito nacional.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  // Marca el programa actual y atenúa los ya emitidos, según la hora del dispositivo.
+  (function () {
+    var items = Array.prototype.slice.call(document.querySelectorAll('#programas .programa'));
+    var reloj = document.getElementById('reloj');
+    var tituloAhora = document.getElementById('titulo-ahora');
+
+    function aMinutos(hhmm) {
+      var p = hhmm.split(':');
+      return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+    }
+
+    function actualizar() {
+      var ahora = new Date();
+      var min = ahora.getHours() * 60 + ahora.getMinutes();
+      reloj.textContent = ('0' + ahora.getHours()).slice(-2) + ':' + ('0' + ahora.getMinutes()).slice(-2);
+
+      var indiceActual = -1;
+      items.forEach(function (li, i) {
+        if (aMinutos(li.dataset.inicio) <= min) indiceActual = i;
+      });
+
+      items.forEach(function (li, i) {
+        li.classList.toggle('pasado', i < indiceActual);
+        li.classList.toggle('actual', i === indiceActual);
+      });
+
+      tituloAhora.textContent = indiceActual >= 0
+        ? items[indiceActual].querySelector('h3').textContent
+        : 'Emisión no iniciada';
+    }
+
+    actualizar();
+    setInterval(actualizar, 30000);
+  })();
+</script>
+</body>
+</html>
